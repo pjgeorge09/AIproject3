@@ -1,0 +1,3 @@
+1) Inputs ad Outputs of the neuron are time (as x) and predicted energy useage as output (need to verify second part)
+
+2) Linear activation function.
