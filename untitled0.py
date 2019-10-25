@@ -5,6 +5,15 @@ Created on Wed Oct 23 11:59:23 2019
 @author: Peter
 """
 import pandas as pd
+import math
+import random
+
+def initArray(number):
+    anArray = []
+    for i in range(0,number):
+        anArray.append(random.uniform(-0.5,0.5))
+        anArray[i] = round(anArray[i],6)
+    return anArray
 
 '''A method to normalize sets of data to values [0-1]'''
 def normalizeData (aDF):
@@ -16,15 +25,33 @@ def normalizeData (aDF):
     aDF['Volts'] = round((aDF['Volts'] - minV) / (maxV - minV),6)
     return aDF;
 
-'''Maybe we should do them at random'''
-def linearAF (data):
-    #weightsMaybe = data[0]
-    count = len(data)
-    while (count > 0):
+'''Maybe we should do them at random
+    PP10, page 9. f = activation function
+    The task is to find proper values of weight set
+    (w1 w2 … wni), in order to minimize TE!'''
+def linearAF (weights, data, threshold):
+    TE = 2000
+    while (TE > threshold):
         #Do stuff       Y = AX
-        print("")
-        
-    
+        TE = 0
+        for i in range(0,len(data)):
+            row = data[i]
+            pattern = []
+            for _ in row:
+                pattern.append(row[_])
+            x1 = pattern[0]
+            actual = (weights[0] * x1) + weights[1]
+            desired = pattern[1]
+            gradient = -(desired - actual)
+            delta = []
+            for _ in pattern:
+                pattern[_] = pattern[_] *gradient * 2
+                print(pattern[_])
+                delta.append(-alpha * gradient)
+            for _ in weights:
+                weights[_] += delta
+           
+        break
     return
 
 '''Create Data Objects'''
@@ -32,18 +59,31 @@ dfT1 = pd.read_csv('train_data_1.txt', header=None, names = ['Hour', 'Volts'])
 dfT2 = pd.read_csv('train_data_2.txt', header=None, names = ['Hour', 'Volts'])
 dfT3 = pd.read_csv('train_data_3.txt', header=None, names = ['Hour', 'Volts'])
 dfT4 = pd.read_csv('test_data_4.txt' , header=None, names = ['Hour', 'Volts'])
+#Just need one file for train data
+dfX = pd.concat([dfT1,dfT2,dfT3], ignore_index=True)
 
 '''Normalize Data'''
-df1_N = normalizeData(dfT1)
-df2_N = normalizeData(dfT2)
-df3_N = normalizeData(dfT3)
+#df1_N = normalizeData(dfT1)
+#df2_N = normalizeData(dfT2)
+#df3_N = normalizeData(dfT3)
 df4_N = normalizeData(dfT4)
+dfX_N = normalizeData(dfX) #The one file for train data, normalized
 
 '''Turn DF objects to lists for speed'''
-df1_NL = df1_N.to_dict('index')
-df2_NL = df2_N.to_dict('index')
-df3_NL = df3_N.to_dict('index')
+#df1_NL = df1_N.to_dict('index')
+#df2_NL = df2_N.to_dict('index')
+#df3_NL = df3_N.to_dict('index')
 df4_NL = df4_N.to_dict('index')
+dfX_NL = dfX_N.to_dict('index')
+
+'''Define Variables'''
+maxIter = 1000
+alpha = 0.1
+weightsA = initArray(2)
+weightsB = initArray(3)
+weightsC = initArray(4)
+
+linearAF(weightsA, dfX_NL, 1)
 
 '''Three cases to do.
     1) y= (w1)x + w0                        where x1=x
