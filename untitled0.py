@@ -29,31 +29,106 @@ def normalizeData (aDF):
     PP10, page 9. f = activation function
     The task is to find proper values of weight set
     (w1 w2 … wni), in order to minimize TE!'''
-def linearAF (weights, data, threshold):
+def linearAF (weight, data, threshold):
+    weights = weight
     TE = 2000
-    while (TE > threshold):
+    count = 1
+    while (count < 5):
+        print("Iteration " + str(count))
         #Do stuff       Y = AX
         TE = 0
+        print(str(weights) + " weights before")
         for i in range(0,len(data)):
+            print(weights)
+            row = data[i]
+            pattern = []
+            for _ in row:
+                pattern.append(row[_])
+            #print(pattern)
+            #print(weights)
+            x1 = pattern[0]
+            actual = (weights[0] * x1) + weights[1] 
+            desired = pattern[1]
+            gradient = (desired - actual)
+            delta = []
+            for _ in range(0,len(pattern)):
+                delta.append(alpha * gradient)
+            
+            for _ in range(0,len(weights)):
+                weights[_] = weights[_] + delta[_]
+            TE += (pow(gradient,2))
+            #print(delta)
+            
+            #print(" ")
+        print("TE is " + str(TE))
+        count +=1
+
+    return
+
+def linearAFB (weight, data, threshold):
+    weights = weight
+    TE = 2000
+    count = 1
+    while (count < 5):
+        print("Iteration " + str(count))
+        #Do stuff       Y = AX
+        TE = 0
+        print(str(weights) + " weights before")
+        for i in range(0,len(data)):
+            print(weights)
             row = data[i]
             pattern = []
             for _ in row:
                 pattern.append(row[_])
             x1 = pattern[0]
-            actual = (weights[0] * x1) + weights[1]
+            x2 = pattern[0] ** 2
+            actual = ((weights[2] * x2) + (weights[1] * x1) + weights[0])
             desired = pattern[1]
-            gradient = -(desired - actual)
+            gradient = (desired - actual)
             delta = []
-            for _ in pattern:
-                pattern[_] = pattern[_] *gradient * 2
-                print(pattern[_])
-                delta.append(-alpha * gradient)
-            for _ in weights:
-                weights[_] += delta
-           
-        break
+            for _ in range(0,len(weights)):
+                delta.append(alpha * gradient)
+            print(str(delta) + " delta")
+            for _ in range(0,len(weights)):
+                weights[_] = weights[_] + delta[_]
+            TE += (gradient ** 2)
+        print("TE is " + str(TE))
+        count +=1
+
     return
 
+def linearAFC (weight, data, threshold):
+    weights = weight
+    TE = 2000
+    count = 1
+    while (count < 5):
+        print("Iteration " + str(count))
+        #Do stuff       Y = AX
+        TE = 0
+        print(str(weights) + " weights before")
+        for i in range(0,len(data)):
+            print(weights)
+            row = data[i]
+            pattern = []
+            for _ in row:
+                pattern.append(row[_])
+            x1 = pattern[0]
+            x2 = pattern[0] ** 2
+            x3 = pattern[0] ** 3
+            actual = ((weights[3] * x3) + (weights[2] * x2) + (weights[1] * x1) + weights[0])
+            desired = pattern[1]
+            gradient = (desired - actual)
+            delta = []
+            for _ in range(0,len(weights)):
+                delta.append(alpha * gradient)
+            
+            for _ in range(0,len(weights)):
+                weights[_] = weights[_] + delta[_]
+            TE += (pow(gradient,2))
+        print("TE is " + str(TE))
+        count +=1
+
+    return
 '''Create Data Objects'''
 dfT1 = pd.read_csv('train_data_1.txt', header=None, names = ['Hour', 'Volts'])
 dfT2 = pd.read_csv('train_data_2.txt', header=None, names = ['Hour', 'Volts'])
@@ -78,13 +153,14 @@ dfX_NL = dfX_N.to_dict('index')
 
 '''Define Variables'''
 maxIter = 1000
-alpha = 0.1
+alpha = 0.5
 weightsA = initArray(2)
 weightsB = initArray(3)
 weightsC = initArray(4)
 
-linearAF(weightsA, dfX_NL, 1)
-
+#linearAF(weightsA, dfX_NL, 1)
+#linearAFB(weightsB, dfX_NL, 3)
+linearAFC(weightsC, dfX_NL, 3)
 '''Three cases to do.
     1) y= (w1)x + w0                        where x1=x
     2) y= (w2)(x2)+(w1)x + w0               where x2=(x^2)
