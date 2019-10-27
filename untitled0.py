@@ -29,49 +29,54 @@ def normalizeData (aDF):
     PP10, page 9. f = activation function
     The task is to find proper values of weight set
     (w1 w2 … wni), in order to minimize TE!'''
-def linearAF (weight, data, threshold):
-    alpha = 0.2
+def linearAF (weight, data):
+    alpha = 0.001
     weights = weight
     TE = 2000
     count = 1
-    while (count < 5):
-        print("Iteration " + str(count))
+    while (count < maxIter):
         #Do stuff       Y = AX
         TE = 0
-        print(str(weights) + " weights before")
         for i in range(0,len(data)):
-            print(weights)
             row = data[i]
             pattern = []
             for _ in row:
                 pattern.append(row[_])
-            #print(pattern)
-            #print(weights)
+            x0 = 1
             x1 = pattern[0]
-            actual = (weights[0] * x1) + weights[1] 
-            desired = pattern[1]
-            gradient = (desired - actual)
-            delta = []
-            for _ in range(0,len(pattern)):
-                delta.append(alpha * gradient)
-            
+            xArray = []
+            xArray.append(x0)
+            xArray.append(x1)
             for _ in range(0,len(weights)):
-                weights[_] = weights[_] + delta[_]
-            TE += (pow(gradient,2))
-            #print(delta)
+                actual = ((weights[1] * x1) + weights[0])
+                weights[_] += 2*alpha*(pattern[1]-actual)*xArray[_]
             
-            #print(" ")
-        print("TE is " + str(TE))
+            error = (pattern[1]-((weights[1] * x1) + weights[0]))
+            TE += error**2
         count +=1
-
+    #To test, do this same thing on any 1/3rd section of the combined test data.
+    TE = 0
+    for i in range(0,16):
+        row = data[i]
+        pattern = []
+        for _ in row:
+            pattern.append(row[_])
+        x0 = 1
+        x1 = pattern[0]
+        xArray = []
+        xArray.append(x0)
+        xArray.append(x1)
+        error = (pattern[1]-((weights[1] * x1) + weights[0]))
+        TE += error**2
+    print("TOTAL ERROR RUN ON THE WHOLE IS " + str(TE))
     return weights
 
-def linearAFB (weight, data, threshold):
+def linearAFB (weight, data):
     alpha = 0.075
     weights = weight
     TE = 2000
     count = 1
-    while (count < 500):
+    while (count < maxIter):
         #print("Iteration " + str(count))
         #Do stuff       Y = AX
         TE = 0
@@ -116,12 +121,12 @@ def linearAFB (weight, data, threshold):
     print("TOTAL ERROR RUN ON THE WHOLE IS " + str(TE))
     return weights
 
-def linearAFC (weight, data, threshold):
+def linearAFC (weight, data):
     alpha = 0.08
     weights = weight
     TE = 2000
     count = 1
-    while (count < 1000):
+    while (count < maxIter):
         #print("Iteration " + str(count))
         #Do stuff       Y = AX
         TE = 0
@@ -193,15 +198,16 @@ df4_NL = df4_N.to_dict('index')
 dfX_NL = dfX_N.to_dict('index')
 
 '''Define Variables'''
-maxIter = 1000
+maxIter = 500
 weightsA = initArray(2)
 weightsB = initArray(3)
 weightsC = initArray(4)
 
-#eqA = linearAF(weightsA, dfX_NL, 1)
-eqB = linearAFB(weightsB, dfX_NL, 3)
+eqA = linearAF(weightsA, dfX_NL)
 print("------------------------------------------")
-eqC = linearAFC(weightsC, dfX_NL, 3)
+eqB = linearAFB(weightsB, dfX_NL)
+print("------------------------------------------")
+eqC = linearAFC(weightsC, dfX_NL)
 #print(eqC)
 '''Three cases to do.
     1) y= (w1)x + w0                        where x1=x
