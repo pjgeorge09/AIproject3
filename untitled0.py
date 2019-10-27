@@ -30,6 +30,7 @@ def normalizeData (aDF):
     The task is to find proper values of weight set
     (w1 w2 … wni), in order to minimize TE!'''
 def linearAF (weight, data, threshold):
+    alpha = 0.2
     weights = weight
     TE = 2000
     count = 1
@@ -63,72 +64,76 @@ def linearAF (weight, data, threshold):
         print("TE is " + str(TE))
         count +=1
 
-    return
+    return weights
 
 def linearAFB (weight, data, threshold):
+    alpha = 0.3
     weights = weight
     TE = 2000
     count = 1
-    while (count < 5):
+    while (count < 20):
         print("Iteration " + str(count))
         #Do stuff       Y = AX
         TE = 0
         print(str(weights) + " weights before")
         for i in range(0,len(data)):
-            print(weights)
             row = data[i]
             pattern = []
             for _ in row:
                 pattern.append(row[_])
+            x0 = 1
             x1 = pattern[0]
             x2 = pattern[0] ** 2
-            actual = ((weights[2] * x2) + (weights[1] * x1) + weights[0])
-            desired = pattern[1]
-            gradient = (desired - actual)
-            delta = []
+            xArray = []
+            xArray.append(x0)
+            xArray.append(x1)
+            xArray.append(x2)
             for _ in range(0,len(weights)):
-                delta.append(alpha * gradient)
-            print(str(delta) + " delta")
-            for _ in range(0,len(weights)):
-                weights[_] = weights[_] + delta[_]
-            TE += (gradient ** 2)
+                actual = ((weights[2] * x2) + (weights[1] * x1) + weights[0])
+                weights[_] += 2*alpha*(pattern[1]-actual)*xArray[_]
+            
+            error = (pattern[1]-((weights[2] * x2) + (weights[1] * x1) + weights[0]))
+            TE += error**2
         print("TE is " + str(TE))
         count +=1
 
-    return
+    return weights
 
 def linearAFC (weight, data, threshold):
+    alpha = 0.33
     weights = weight
     TE = 2000
     count = 1
-    while (count < 5):
+    while (count < 20):
         print("Iteration " + str(count))
         #Do stuff       Y = AX
         TE = 0
         print(str(weights) + " weights before")
         for i in range(0,len(data)):
-            print(weights)
             row = data[i]
             pattern = []
             for _ in row:
                 pattern.append(row[_])
+            x0 = 1
             x1 = pattern[0]
             x2 = pattern[0] ** 2
             x3 = pattern[0] ** 3
-            actual = ((weights[3] * x3) + (weights[2] * x2) + (weights[1] * x1) + weights[0])
-            desired = pattern[1]
-            gradient = (desired - actual)
-            delta = []
+            xArray = []
+            xArray.append(x0)
+            xArray.append(x1)
+            xArray.append(x2)
+            xArray.append(x3)
             for _ in range(0,len(weights)):
-                delta.append(alpha * gradient)
-            
-            for _ in range(0,len(weights)):
-                weights[_] = weights[_] + delta[_]
-            TE += (pow(gradient,2))
+                actual = ((weights[3] * x3) + (weights[2] * x2) + (weights[1] * x1) + weights[0])
+                weights[_] += 2*alpha*(pattern[1]-actual)*xArray[_]
+            error = (pattern[1] - (((weights[3] * x3) + (weights[2] * x2) + (weights[1] * x1) + weights[0])))
+            TE += error**2
         print("TE is " + str(TE))
         count +=1
 
-    return
+    return weights
+
+
 '''Create Data Objects'''
 dfT1 = pd.read_csv('train_data_1.txt', header=None, names = ['Hour', 'Volts'])
 dfT2 = pd.read_csv('train_data_2.txt', header=None, names = ['Hour', 'Volts'])
@@ -153,14 +158,14 @@ dfX_NL = dfX_N.to_dict('index')
 
 '''Define Variables'''
 maxIter = 1000
-alpha = 0.5
 weightsA = initArray(2)
 weightsB = initArray(3)
 weightsC = initArray(4)
 
-#linearAF(weightsA, dfX_NL, 1)
-#linearAFB(weightsB, dfX_NL, 3)
-linearAFC(weightsC, dfX_NL, 3)
+#eqA = linearAF(weightsA, dfX_NL, 1)
+eqB = linearAFB(weightsB, dfX_NL, 3)
+print("------------------------------------------")
+eqC = linearAFC(weightsC, dfX_NL, 3)
 '''Three cases to do.
     1) y= (w1)x + w0                        where x1=x
     2) y= (w2)(x2)+(w1)x + w0               where x2=(x^2)
