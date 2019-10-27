@@ -67,11 +67,11 @@ def linearAF (weight, data, threshold):
     return weights
 
 def linearAFB (weight, data, threshold):
-    alpha = 0.3
+    alpha = 0.04
     weights = weight
     TE = 2000
     count = 1
-    while (count < 20):
+    while (count < 1000):
         print("Iteration " + str(count))
         #Do stuff       Y = AX
         TE = 0
@@ -96,7 +96,23 @@ def linearAFB (weight, data, threshold):
             TE += error**2
         print("TE is " + str(TE))
         count +=1
-
+        
+    TE = 0
+    for i in range(32,48):
+        row = data[i]
+        pattern = []
+        for _ in row:
+            pattern.append(row[_])
+        x0 = 1
+        x1 = pattern[0]
+        x2 = pattern[0] ** 2
+        xArray = []
+        xArray.append(x0)
+        xArray.append(x1)
+        xArray.append(x2)
+        error = (pattern[1]-((weights[2]*x2) + (weights[1] * x1) + weights[0]))
+        TE += error**2
+    print("TOTAL ERROR RUN ON THE WHOLE IS " + str(TE))
     return weights
 
 def linearAFC (weight, data, threshold):
@@ -165,7 +181,8 @@ weightsC = initArray(4)
 #eqA = linearAF(weightsA, dfX_NL, 1)
 eqB = linearAFB(weightsB, dfX_NL, 3)
 print("------------------------------------------")
-eqC = linearAFC(weightsC, dfX_NL, 3)
+#eqC = linearAFC(weightsC, dfX_NL, 3)
+#print(eqC)
 '''Three cases to do.
     1) y= (w1)x + w0                        where x1=x
     2) y= (w2)(x2)+(w1)x + w0               where x2=(x^2)
