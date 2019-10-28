@@ -26,22 +26,13 @@ def normalizeData (aDF):
     aDF['Volts'] = round((aDF['Volts'] - minV) / (maxV - minV),6)
     return aDF;
 
-    
-def plotIt(dayHours, dayVolts, graphTitle):
-    plt.plot(dayHours, dayVolts,'+', color = 'black')
-    plt.xlabel('Hour, normalized')
-    plt.ylabel('Volts, normalized')
-    plt.title(graphTitle, loc='center')
-    plt.show()
-    return
-
 '''Maybe we should do them at random
     PP10, page 9. f = activation function
     The task is to find proper values of weight set
     (w1 w2 … wni), in order to minimize TE!'''
-def linearAF (weight, data):
+def linearAF (weights, data):
+ 
     alpha = 0.001
-    weights = weight
     TE = 2000
     count = 1
     while (count < maxIter):
@@ -64,26 +55,10 @@ def linearAF (weight, data):
             error = (pattern[1]-((weights[1] * x1) + weights[0]))
             TE += error**2
         count +=1
-    #To test, do this same thing on any 1/3rd section of the combined test data.
-    TE = 0
-    for i in range(0,16):
-        row = data[i]
-        pattern = []
-        for _ in row:
-            pattern.append(row[_])
-        x0 = 1
-        x1 = pattern[0]
-        xArray = []
-        xArray.append(x0)
-        xArray.append(x1)
-        error = (pattern[1]-((weights[1] * x1) + weights[0]))
-        TE += error**2
-    print("TOTAL ERROR RUN ON THE WHOLE IS " + str(TE))
     return weights
 
-def linearAFB (weight, data):
+def linearAFB (weights, data):
     alpha = 0.075
-    weights = weight
     TE = 2000
     count = 1
     while (count < maxIter):
@@ -111,29 +86,10 @@ def linearAFB (weight, data):
             TE += error**2
         #print("TE is " + str(TE))
         count +=1
-        
-    #To test, do this same thing on any 1/3rd section of the combined test data.
-    TE = 0
-    for i in range(32,48):
-        row = data[i]
-        pattern = []
-        for _ in row:
-            pattern.append(row[_])
-        x0 = 1
-        x1 = pattern[0]
-        x2 = pattern[0] ** 2
-        xArray = []
-        xArray.append(x0)
-        xArray.append(x1)
-        xArray.append(x2)
-        error = (pattern[1]-((weights[2]*x2) + (weights[1] * x1) + weights[0]))
-        TE += error**2
-    print("TOTAL ERROR RUN ON THE WHOLE IS " + str(TE))
     return weights
 
-def linearAFC (weight, data):
+def linearAFC (weights, data):
     alpha = 0.08
-    weights = weight
     TE = 2000
     count = 1
     while (count < maxIter):
@@ -163,7 +119,7 @@ def linearAFC (weight, data):
         #print("TE is " + str(TE))
         count +=1
 
-    #To test, do this same thing on any 1/3rd section of the combined test data.
+    ''' #To test, do this same thing on any 1/3rd section of the combined test data.
     TE = 0
     for i in range(15,32):
         row = data[i]
@@ -181,32 +137,42 @@ def linearAFC (weight, data):
         xArray.append(x3)
         error = (pattern[1]-((weights[3]*x3) + (weights[2]*x2) + (weights[1] * x1) + weights[0]))
         TE += error**2
-    print("TOTAL ERROR RUN ON THE WHOLE IS " + str(TE))
+    print("TOTAL ERROR RUN ON THE WHOLE IS " + str(TE))'''
     return weights
 
-
-def makeplot(data, otherData, weights):
-    l_dayHours = [];
-    l_dayVolts = [];
-    for i in range(len(data[0])):
-        for j in range (len(data)):
-            if(i==0):
-                l_dayHours.append(dayOne[j][i]);
-            else:
-                l_dayVolts.append(dayOne[j][i]);
-                
-
+def report(eq1, eq2, eq3):
+    return
     
-    plotIt(l_dayHours, l_dayVolts,"Training on equation C")
+    
+def plotIt(dayHours, dayVolts, graphTitle, weights):
+    
+    plt.plot(dayHours, dayVolts,'+', color = 'black')    
+    values = []
+    for _ in dayHours:
+        values.append(_)
+    yData = []
+    for x in values:
+        y = 0
+        for i in range(0,len(weights)):
+            y += weights[i] * (x**i)
+        yData.append(float(y))
+    print(yData)
+    plt.xticks(np.arange(min(values),max(yData)+1, 0.1))    
+    plt.plot(values,yData, 'o', color='blue', markersize=4)
+    plt.plot(values,yData, '-', 'o', color='blue', markersize=4)
+    plt.xlabel('Hour, normalized')
+    plt.ylabel('Volts, normalized')
+    plt.title(graphTitle, loc='center')
+    plt.show()
+    return
+
+def makeplot(norm_DF, weights, title):
+    l_dayHours = norm_DF['Hour']
+    l_dayVolts = norm_DF['Volts']
+    plotIt(l_dayHours, l_dayVolts,title, weights)
     
     return
 
-dayOne = np.genfromtxt('train_data_1.txt', delimiter = ',')
-dayTwo = np.genfromtxt('train_data_2.txt', delimiter = ',')
-dayThree = np.genfromtxt('train_data_3.txt', delimiter = ',')
-dayFour = np.genfromtxt('test_data_4.txt', delimiter = ',')
-
-        
 '''Create Data Objects'''
 dfT1 = pd.read_csv('train_data_1.txt', header=None, names = ['Hour', 'Volts'])
 dfT2 = pd.read_csv('train_data_2.txt', header=None, names = ['Hour', 'Volts'])
@@ -230,21 +196,19 @@ df4_NL = df4_N.to_dict('index')
 dfX_NL = dfX_N.to_dict('index')
 
 '''Define Variables'''
-maxIter = 500
+maxIter = 10000
 weightsA = initArray(2)
 weightsB = initArray(3)
 weightsC = initArray(4)
 
+'''Equations built by training on all 3 days at one time'''
 eqA = linearAF(weightsA, dfX_NL)
-print("------------------------------------------")
 eqB = linearAFB(weightsB, dfX_NL)
-print("------------------------------------------")
 eqC = linearAFC(weightsC, dfX_NL)
-makeplot(dayFour, dfX_NL, eqC);
 
+'''Report training total error for each of the three days'''
+report(eqA, eqB, eqC)
 
-#print(eqC)
-'''Three cases to do.
-    1) y= (w1)x + w0                        where x1=x
-    2) y= (w2)(x2)+(w1)x + w0               where x2=(x^2)
-    3) y= (w3)(x3)+(w2)(x2)+(w1)x + w0      where x3=(x^3)'''
+makeplot(df1_N, eqA, "Linear (a) on Day 1");
+makeplot(df1_N, eqB, "Quadratic (b) on Day 1");
+makeplot(df1_N, eqC, "Cubic (c) on Day 1");
