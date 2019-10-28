@@ -1,3 +1,12 @@
 1) Inputs ad Outputs of the neuron are time (as x) and predicted energy useage as output (need to verify second part)
 
 2) Linear activation function.
+
+4)
+Used 10,000 iterations. Unneeded for Linear, and maybe a bit for quadratic, but good gauge for cubic. 
+
+Normalized the data, because when taking Total Error as [Desired - Actual] squared, for regular data, you get numbers in the millions or higher. Hard to read and work with.
+
+Optimal Learning rates found by trial and error, for 0.001 on Linear(a), 0.001 on Quadratic(b), and 0.05 on Cubic(c). Variations to these values proved, in both directions, to alter the TE for the worse (Limited trial to 4 decimals 0.0001 max changes)
+
+Pre-processing steps taken : Just normalzied the data. Tried playing around with incrementing the 0 hour so that it would not be at zero, but it didn't change anything so we took it out. 
