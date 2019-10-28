@@ -141,11 +141,16 @@ def linearAFC (weights, data):
     return weights
 
 def report(eq1, eq2, eq3):
+    #go by a,b,c
+    eqs = [eq1, eq2, eq3]
+    for i in range (1,4):
+        print("Total Error for Day " + str(i) + " after completely trained is " + str(calc(eqs[1])))
     return
     
+def calc():
+    return
     
 def plotIt(dayHours, dayVolts, graphTitle, weights):
-    
     plt.plot(dayHours, dayVolts,'+', color = 'black')    
     values = []
     for _ in dayHours:
@@ -156,10 +161,8 @@ def plotIt(dayHours, dayVolts, graphTitle, weights):
         for i in range(0,len(weights)):
             y += weights[i] * (x**i)
         yData.append(float(y))
-    print(yData)
-    plt.xticks(np.arange(min(values),max(yData)+1, 0.1))    
-    plt.plot(values,yData, 'o', color='blue', markersize=4)
-    plt.plot(values,yData, '-', 'o', color='blue', markersize=4)
+    plt.plot(values, yData, 'o', color='blue', markersize=3)
+    plt.plot(values, yData, '-', color='blue', linewidth=1)
     plt.xlabel('Hour, normalized')
     plt.ylabel('Volts, normalized')
     plt.title(graphTitle, loc='center')
@@ -210,5 +213,14 @@ eqC = linearAFC(weightsC, dfX_NL)
 report(eqA, eqB, eqC)
 
 makeplot(df1_N, eqA, "Linear (a) on Day 1");
+makeplot(df2_N, eqA, "Linear (a) on Day 2");
+makeplot(df3_N, eqA, "Linear (a) on Day 3");
+
 makeplot(df1_N, eqB, "Quadratic (b) on Day 1");
+makeplot(df2_N, eqB, "Quadratic (b) on Day 2");
+makeplot(df3_N, eqB, "Quadratic (b) on Day 3");
+
 makeplot(df1_N, eqC, "Cubic (c) on Day 1");
+makeplot(df2_N, eqC, "Cubic (c) on Day 2");
+makeplot(df3_N, eqC, "Cubic (c) on Day 3");
+
