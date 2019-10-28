@@ -5,7 +5,6 @@ Created on Wed Oct 23 11:59:23 2019
 """
 import pandas as pd
 import numpy as np
-import math
 import random
 import matplotlib.pyplot as plt
 
@@ -49,7 +48,6 @@ def linearAF (weights, data):
             for _ in range(0,len(weights)):
                 actual = ((weights[1] * x1) + weights[0])
                 weights[_] += 2*alpha*(pattern[1]-actual)*xArray[_]
-            
             error = (pattern[1]-((weights[1] * x1) + weights[0]))
             TE += error**2
         count +=1
@@ -212,4 +210,5 @@ reports = [[report(eqA, df1_NL), report(eqB, df1_NL), report(eqC, df1_NL)],
           [report(eqA, df4_NL), report(eqB, df4_NL), report(eqC, df4_NL)]]
 errorDF = pd.DataFrame(reports, columns = ['Linear TE (a)', 'Quadratic TE (b)', 'Cubic TE (c)'])
 errorDF.index = np.arange(1, len(errorDF)+1)
+errorDF.index.name = "Day"
 print(errorDF)
