@@ -31,12 +31,10 @@ def normalizeData (aDF):
     The task is to find proper values of weight set
     (w1 w2 … wni), in order to minimize TE!'''
 def linearAF (weights, data):
- 
     alpha = 0.001
     TE = 2000
     count = 1
     while (count < maxIter):
-        #Do stuff       Y = AX
         TE = 0
         for i in range(0,len(data)):
             row = data[i]
@@ -58,14 +56,11 @@ def linearAF (weights, data):
     return weights
 
 def linearAFB (weights, data):
-    alpha = 0.075
+    alpha = 0.001
     TE = 2000
     count = 1
     while (count < maxIter):
-        #print("Iteration " + str(count))
-        #Do stuff       Y = AX
         TE = 0
-        #print(str(weights) + " weights before")
         for i in range(0,len(data)):
             row = data[i]
             pattern = []
@@ -84,19 +79,15 @@ def linearAFB (weights, data):
             
             error = (pattern[1]-((weights[2] * x2) + (weights[1] * x1) + weights[0]))
             TE += error**2
-        #print("TE is " + str(TE))
         count +=1
     return weights
 
 def linearAFC (weights, data):
-    alpha = 0.08
+    alpha = 0.05
     TE = 2000
     count = 1
     while (count < maxIter):
-        #print("Iteration " + str(count))
-        #Do stuff       Y = AX
         TE = 0
-        #print(str(weights) + " weights before")
         for i in range(0,len(data)):
             row = data[i]
             pattern = []
@@ -116,39 +107,25 @@ def linearAFC (weights, data):
                 weights[_] += 2*alpha*(pattern[1]-actual)*xArray[_]
             error = (pattern[1] - (((weights[3] * x3) + (weights[2] * x2) + (weights[1] * x1) + weights[0])))
             TE += error**2
-        #print("TE is " + str(TE))
         count +=1
+    return weights
 
-    ''' #To test, do this same thing on any 1/3rd section of the combined test data.
+def report(eq, actual):
     TE = 0
-    for i in range(15,32):
-        row = data[i]
+    while(len(eq) < 4):
+        eq.append(0)
+    hours = []
+    for _ in dfHours:
+        hours.append(_)
+    for i in range(0,len(hours)):
+        row = actual[i]
         pattern = []
         for _ in row:
             pattern.append(row[_])
-        x0 = 1
-        x1 = pattern[0]
-        x2 = pattern[0] ** 2
-        x3 = pattern[0] ** 3
-        xArray = []
-        xArray.append(x0)
-        xArray.append(x1)
-        xArray.append(x2)
-        xArray.append(x3)
-        error = (pattern[1]-((weights[3]*x3) + (weights[2]*x2) + (weights[1] * x1) + weights[0]))
+        x = [1, pattern[0], pattern[0] **2, pattern[0] **3]
+        error = (pattern[1]-((eq[3]*x[3]) + (eq[2]*x[2]) + (eq[1] * x[1]) + eq[0]))
         TE += error**2
-    print("TOTAL ERROR RUN ON THE WHOLE IS " + str(TE))'''
-    return weights
-
-def report(eq1, eq2, eq3):
-    #go by a,b,c
-    eqs = [eq1, eq2, eq3]
-    for i in range (1,4):
-        print("Total Error for Day " + str(i) + " after completely trained is " + str(calc(eqs[1])))
-    return
-    
-def calc():
-    return
+    return round(TE, 4)
     
 def plotIt(dayHours, dayVolts, graphTitle, weights):
     plt.plot(dayHours, dayVolts,'+', color = 'black')    
@@ -173,7 +150,6 @@ def makeplot(norm_DF, weights, title):
     l_dayHours = norm_DF['Hour']
     l_dayVolts = norm_DF['Volts']
     plotIt(l_dayHours, l_dayVolts,title, weights)
-    
     return
 
 '''Create Data Objects'''
@@ -183,6 +159,7 @@ dfT3 = pd.read_csv('train_data_3.txt', header=None, names = ['Hour', 'Volts'])
 dfT4 = pd.read_csv('test_data_4.txt' , header=None, names = ['Hour', 'Volts'])
 #Just need one file for train data
 dfX = pd.concat([dfT1,dfT2,dfT3], ignore_index=True)
+df4_L = dfT4.to_dict('index')
 
 '''Normalize Data'''
 df1_N = normalizeData(dfT1)
@@ -190,6 +167,8 @@ df2_N = normalizeData(dfT2)
 df3_N = normalizeData(dfT3)
 df4_N = normalizeData(dfT4)
 dfX_N = normalizeData(dfX) #The one file for train data, normalized
+
+dfHours = df1_N['Hour']
 
 '''Turn DF objects to lists for speed'''
 df1_NL = df1_N.to_dict('index')
@@ -209,18 +188,29 @@ eqA = linearAF(weightsA, dfX_NL)
 eqB = linearAFB(weightsB, dfX_NL)
 eqC = linearAFC(weightsC, dfX_NL)
 
-'''Report training total error for each of the three days'''
-report(eqA, eqB, eqC)
+'''Plot the data '''
+makeplot(df1_N, eqA, "Linear Training (a) on Day 1");
+makeplot(df2_N, eqA, "Linear Training (a) on Day 2");
+makeplot(df3_N, eqA, "Linear Training (a) on Day 3");
+makeplot(df4_N, eqA, "Linear Testing (a) on Day 4");
 
-makeplot(df1_N, eqA, "Linear (a) on Day 1");
-makeplot(df2_N, eqA, "Linear (a) on Day 2");
-makeplot(df3_N, eqA, "Linear (a) on Day 3");
+makeplot(df1_N, eqB, "Quadratic Training (b) on Day 1");
+makeplot(df2_N, eqB, "Quadratic Training (b) on Day 2");
+makeplot(df3_N, eqB, "Quadratic Training (b) on Day 3");
+makeplot(df4_N, eqB, "Quadratic Testing (b) on Day 4");
 
-makeplot(df1_N, eqB, "Quadratic (b) on Day 1");
-makeplot(df2_N, eqB, "Quadratic (b) on Day 2");
-makeplot(df3_N, eqB, "Quadratic (b) on Day 3");
+makeplot(df1_N, eqC, "Cubic Training (c) on Day 1");
+makeplot(df2_N, eqC, "Cubic Training (c) on Day 2");
+makeplot(df3_N, eqC, "Cubic Training (c) on Day 3");
+makeplot(df4_N, eqC, "Cubic Testing (c) on Day 4");
 
-makeplot(df1_N, eqC, "Cubic (c) on Day 1");
-makeplot(df2_N, eqC, "Cubic (c) on Day 2");
-makeplot(df3_N, eqC, "Cubic (c) on Day 3");
-
+'''Report the errors'''
+# DF object to hold all the error percents
+reports = [[report(eqA, df1_NL), report(eqB, df1_NL), report(eqC, df1_NL)],
+          [report(eqA, df2_NL), report(eqB, df2_NL), report(eqC, df2_NL)],
+          [report(eqA, df3_NL), report(eqB, df3_NL), report(eqC, df3_NL)],
+          [report(eqA, df4_NL), report(eqB, df4_NL), report(eqC, df4_NL)]]
+errorDF = pd.DataFrame(reports, columns = ['Linear TE (a)', 'Quadratic TE (b)', 'Cubic TE (c)'])
+errorDF.index = np.arange(1, len(errorDF)+1)
+print(errorDF)
+print(report(eqC, df4_L))
