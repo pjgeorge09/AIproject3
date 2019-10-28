@@ -126,7 +126,7 @@ def report(eq, actual):
     return round(TE, 4)
     
 def plotIt(dayHours, dayVolts, graphTitle, weights):
-    plt.plot(dayHours, dayVolts,'+', color = 'black', label = "Given Data")    
+    plt.plot(dayHours, dayVolts,'P', color = 'black', label = "Actual Data (Volts Used)")    
     values = []
     for _ in dayHours:
         values.append(_)
@@ -137,7 +137,7 @@ def plotIt(dayHours, dayVolts, graphTitle, weights):
             y += weights[i] * (x**i)
         yData.append(float(y))
     plt.plot(values, yData, 'o', color='blue', markersize=3)
-    plt.plot(values, yData, '-', color='blue', linewidth=1, label = "Predicted Data")
+    plt.plot(values, yData, '-', color='blue', linewidth=1, label = "Predicted Data (Volts Calculated)")
     plt.xlabel('Hour, normalized')
     plt.ylabel('Volts, normalized')
     plt.title(graphTitle, loc='center')

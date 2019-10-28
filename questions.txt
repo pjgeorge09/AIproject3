@@ -10,3 +10,5 @@ Normalized the data, because when taking Total Error as [Desired - Actual] squar
 Optimal Learning rates found by trial and error, for 0.001 on Linear(a), 0.001 on Quadratic(b), and 0.05 on Cubic(c). Variations to these values proved, in both directions, to alter the TE for the worse (Limited trial to 4 decimals 0.0001 max changes)
 
 Pre-processing steps taken : Just normalzied the data. Tried playing around with incrementing the 0 hour so that it would not be at zero, but it didn't change anything so we took it out. 
+
+We thought about taking the data of the 3 days at random. It helped sometimes, and hurt others. Decided to take it out.
