@@ -30,11 +30,11 @@ def normalizeData (aDF):
     The task is to find proper values of weight set
     (w1 w2 … wni), in order to minimize TE!'''
 def linearAF (weight, data):
-    alpha = 0.001
+    alpha = 0.005
     weights = weight
     TE = 2000
     count = 1
-    while (count < maxIter):
+    while (count < 5000):
         #Do stuff       Y = AX
         TE = 0
         for i in range(0,len(data)):
@@ -81,6 +81,7 @@ def linearAFB (weight, data):
         #Do stuff       Y = AX
         TE = 0
         #print(str(weights) + " weights before")
+
         for i in range(0,len(data)):
             row = data[i]
             pattern = []
@@ -104,7 +105,7 @@ def linearAFB (weight, data):
         
     #To test, do this same thing on any 1/3rd section of the combined test data.
     TE = 0
-    for i in range(32,48):
+    for i in range(0,16):
         row = data[i]
         pattern = []
         for _ in row:
@@ -155,7 +156,7 @@ def linearAFC (weight, data):
 
     #To test, do this same thing on any 1/3rd section of the combined test data.
     TE = 0
-    for i in range(15,32):
+    for i in range(0,16):
         row = data[i]
         pattern = []
         for _ in row:
