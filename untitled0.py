@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Oct 23 11:59:23 2019
-
 @author: Peter
 """
 import pandas as pd
+import numpy as np
 import math
 import random
+import matplotlib.pyplot as plt
 
 def initArray(number):
     anArray = []
@@ -24,6 +25,15 @@ def normalizeData (aDF):
     aDF['Hour'] = round((aDF['Hour'] - minH) / (maxH - minH),6)
     aDF['Volts'] = round((aDF['Volts'] - minV) / (maxV - minV),6)
     return aDF;
+
+    
+def plotIt(dayHours, dayVolts, graphTitle):
+    plt.plot(dayHours, dayVolts,'+', color = 'black')
+    plt.xlabel('Hour, normalized')
+    plt.ylabel('Volts, normalized')
+    plt.title(graphTitle, loc='center')
+    plt.show()
+    return
 
 '''Maybe we should do them at random
     PP10, page 9. f = activation function
@@ -175,6 +185,28 @@ def linearAFC (weight, data):
     return weights
 
 
+def makeplot(data, otherData, weights):
+    l_dayHours = [];
+    l_dayVolts = [];
+    for i in range(len(data[0])):
+        for j in range (len(data)):
+            if(i==0):
+                l_dayHours.append(dayOne[j][i]);
+            else:
+                l_dayVolts.append(dayOne[j][i]);
+                
+
+    
+    plotIt(l_dayHours, l_dayVolts,"Training on equation C")
+    
+    return
+
+dayOne = np.genfromtxt('train_data_1.txt', delimiter = ',')
+dayTwo = np.genfromtxt('train_data_2.txt', delimiter = ',')
+dayThree = np.genfromtxt('train_data_3.txt', delimiter = ',')
+dayFour = np.genfromtxt('test_data_4.txt', delimiter = ',')
+
+        
 '''Create Data Objects'''
 dfT1 = pd.read_csv('train_data_1.txt', header=None, names = ['Hour', 'Volts'])
 dfT2 = pd.read_csv('train_data_2.txt', header=None, names = ['Hour', 'Volts'])
@@ -184,16 +216,16 @@ dfT4 = pd.read_csv('test_data_4.txt' , header=None, names = ['Hour', 'Volts'])
 dfX = pd.concat([dfT1,dfT2,dfT3], ignore_index=True)
 
 '''Normalize Data'''
-#df1_N = normalizeData(dfT1)
-#df2_N = normalizeData(dfT2)
-#df3_N = normalizeData(dfT3)
+df1_N = normalizeData(dfT1)
+df2_N = normalizeData(dfT2)
+df3_N = normalizeData(dfT3)
 df4_N = normalizeData(dfT4)
 dfX_N = normalizeData(dfX) #The one file for train data, normalized
 
 '''Turn DF objects to lists for speed'''
-#df1_NL = df1_N.to_dict('index')
-#df2_NL = df2_N.to_dict('index')
-#df3_NL = df3_N.to_dict('index')
+df1_NL = df1_N.to_dict('index')
+df2_NL = df2_N.to_dict('index')
+df3_NL = df3_N.to_dict('index')
 df4_NL = df4_N.to_dict('index')
 dfX_NL = dfX_N.to_dict('index')
 
@@ -208,6 +240,9 @@ print("------------------------------------------")
 eqB = linearAFB(weightsB, dfX_NL)
 print("------------------------------------------")
 eqC = linearAFC(weightsC, dfX_NL)
+makeplot(dayFour, dfX_NL, eqC);
+
+
 #print(eqC)
 '''Three cases to do.
     1) y= (w1)x + w0                        where x1=x
