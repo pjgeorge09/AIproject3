@@ -160,7 +160,6 @@ dfT3 = pd.read_csv('train_data_3.txt', header=None, names = ['Hour', 'Volts'])
 dfT4 = pd.read_csv('test_data_4.txt' , header=None, names = ['Hour', 'Volts'])
 #Just need one file for train data
 dfX = pd.concat([dfT1,dfT2,dfT3], ignore_index=True)
-df4_L = dfT4.to_dict('index')
 
 '''Normalize Data'''
 df1_N = normalizeData(dfT1)
@@ -214,4 +213,3 @@ reports = [[report(eqA, df1_NL), report(eqB, df1_NL), report(eqC, df1_NL)],
 errorDF = pd.DataFrame(reports, columns = ['Linear TE (a)', 'Quadratic TE (b)', 'Cubic TE (c)'])
 errorDF.index = np.arange(1, len(errorDF)+1)
 print(errorDF)
-print(report(eqC, df4_L))
